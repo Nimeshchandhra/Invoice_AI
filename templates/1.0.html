@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Invoice Assistant</title>
+</head>
+<body>
+
+<h2>Upload Invoice</h2>
+<input type="file" id="fileInput">
+<button onclick="upload()">Upload</button>
+
+<h2>Ask Question</h2>
+<input type="text" id="query">
+<button onclick="ask()">Ask</button>
+
+<p id="response"></p>
+
+<script>
+async function upload() {
+  const fileInput = document.getElementById("fileInput");
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  await fetch("/upload", {
+    method: "POST",
+    body: formData
+  });
+
+  alert("Uploaded!");
+}
+
+async function ask() {
+  const query = document.getElementById("query").value;
+
+  const res = await fetch("/query", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({query})
+  });
+
+  const data = await res.json();
+  document.getElementById("response").innerText = data.answer;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,403 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0e0c;
+    --paper: #faf8f4;
+    --muted: #8a8680;
+    --accent: #c8460a;
+    --accent-light: #f5e8e0;
+    --border: rgba(15,14,12,0.12);
+    --card: #ffffff;
+    --tag-bg: #f0ece4;
+  }
+
+  body { background: var(--paper); font-family: 'Syne', sans-serif; color: var(--ink); min-height: 100vh; }
+  .shell { display: grid; grid-template-rows: auto 1fr; min-height: 640px; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 28px 14px; border-bottom: 1px solid var(--border); background: var(--paper); }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-mark { width: 32px; height: 32px; background: var(--ink); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .logo-name { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; color: var(--ink); }
+  .logo-sub { font-size: 11px; color: var(--muted); font-weight: 400; font-family: 'DM Mono', monospace; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+  .pill { padding: 5px 12px; border-radius: 100px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); background: var(--card); cursor: pointer; color: var(--muted); transition: all 0.15s; }
+  .pill:hover { color: var(--ink); border-color: var(--ink); }
+  .pill.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  .main { display: grid; grid-template-columns: 1fr 380px; }
+  .left-panel { padding: 32px 28px; border-right: 1px solid var(--border); }
+
+  .section-label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+
+  .upload-zone { border: 1.5px dashed var(--border); border-radius: 16px; padding: 40px 24px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--card); position: relative; overflow: hidden; }
+  .upload-zone:hover, .upload-zone.drag-over { border-color: var(--accent); background: var(--accent-light); }
+  .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+
+  .upload-icon { width: 52px; height: 52px; background: var(--tag-bg); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; transition: all 0.2s; }
+  .upload-zone:hover .upload-icon { background: var(--accent); }
+  .upload-zone:hover .upload-icon svg path,
+  .upload-zone:hover .upload-icon svg polyline,
+  .upload-zone:hover .upload-icon svg line { stroke: white; }
+
+  .upload-headline { font-size: 18px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .upload-sub { font-size: 13px; color: var(--muted); font-weight: 400; line-height: 1.6; }
+  .format-tags { display: flex; gap: 6px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  .tag { font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 4px; background: var(--tag-bg); color: var(--muted); font-weight: 500; }
+
+  .file-list { margin-top: 24px; }
+  .file-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--card); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 8px; animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .file-dot { width: 36px; height: 36px; border-radius: 9px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .file-info { flex: 1; min-width: 0; }
+  .file-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-meta { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+  .file-status { font-size: 11px; padding: 3px 9px; border-radius: 100px; font-weight: 500; background: #eafaf3; color: #1d7a4a; }
+  .file-status.uploading { background: #faf3e0; color: #92620a; }
+  .file-status.error { background: #fceaea; color: #a32d2d; }
+
+  .insights-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 24px; }
+  .insight-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .insight-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .insight-value { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--ink); }
+  .insight-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .progress-bar { height: 3px; background: var(--tag-bg); border-radius: 99px; margin-top: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 1s ease; }
+
+  .right-panel { display: flex; flex-direction: column; height: 100%; }
+  .chat-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); background: var(--paper); display: flex; align-items: center; justify-content: space-between; }
+  .chat-header-left { }
+  .chat-title { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+  .chat-hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .clear-btn { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 100px; padding: 4px 10px; cursor: pointer; transition: all 0.15s; }
+  .clear-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+  .chat-body { flex: 1; padding: 20px 20px 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; min-height: 280px; max-height: 320px; }
+  .message { max-width: 88%; animation: msgIn 0.25s ease; }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .message.user { align-self: flex-end; }
+  .message.ai { align-self: flex-start; }
+  .msg-bubble { padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.6; font-weight: 400; }
+  .message.user .msg-bubble { background: var(--ink); color: #fff; border-bottom-right-radius: 4px; }
+  .message.ai .msg-bubble { background: var(--card); border: 1px solid var(--border); color: var(--ink); border-bottom-left-radius: 4px; }
+  .msg-time { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 4px; padding: 0 4px; }
+  .message.user .msg-time { text-align: right; }
+
+  .quick-chips { display: flex; gap: 6px; padding: 12px 20px 8px; flex-wrap: wrap; }
+  .chip { font-size: 11px; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border); background: var(--card); cursor: pointer; color: var(--muted); font-weight: 500; transition: all 0.15s; white-space: nowrap; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  .chat-input-area { padding: 12px 16px 20px; }
+  .input-wrapper { display: flex; align-items: flex-end; gap: 8px; background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 10px 10px 10px 16px; transition: border-color 0.2s; }
+  .input-wrapper:focus-within { border-color: var(--ink); }
+  .chat-input { flex: 1; border: none; outline: none; background: transparent; font-family: 'Syne', sans-serif; font-size: 13px; color: var(--ink); resize: none; line-height: 1.5; max-height: 80px; min-height: 20px; }
+  .chat-input::placeholder { color: var(--muted); }
+
+  .send-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--ink); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .send-btn:hover { background: var(--accent); transform: scale(1.05); }
+  .send-btn:active { transform: scale(0.97); }
+  .send-btn:disabled { background: var(--border); cursor: default; transform: none; }
+
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 20px; text-align: center; flex: 1; color: var(--muted); }
+  .empty-icon { width: 48px; height: 48px; background: var(--tag-bg); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+  .empty-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .empty-sub { font-size: 12px; line-height: 1.6; }
+
+  .typing { display: flex; align-items: center; gap: 4px; padding: 10px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; border-bottom-left-radius: 4px; width: fit-content; }
+  .dot { width: 5px; height: 5px; background: var(--muted); border-radius: 50%; animation: bounce 1.2s ease-in-out infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+  .notification { position: fixed; bottom: 20px; right: 20px; background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; transform: translateY(80px); opacity: 0; transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 999; pointer-events: none; }
+  .notification.show { transform: translateY(0); opacity: 1; }
+  .notification-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; flex-shrink: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+</style>
+
+<h2 class="sr-only">Invoice assistant — upload invoices and ask questions about them</h2>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="5" height="6" rx="1" fill="white" opacity="0.9"/>
+          <rect x="9" y="2" width="5" height="3" rx="1" fill="white" opacity="0.6"/>
+          <rect x="9" y="7" width="5" height="7" rx="1" fill="white" opacity="0.6"/>
+          <rect x="2" y="10" width="5" height="4" rx="1" fill="white" opacity="0.6"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">Invoiq</div>
+        <div class="logo-sub">Smart document assistant</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="pill active" onclick="this.closest('.topbar').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Upload</button>
+      <button class="pill" onclick="this.closest('.topbar').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">History</button>
+      <button class="pill" onclick="this.closest('.topbar').querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')">Settings</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="left-panel">
+      <div class="section-label">Document Upload</div>
+      <div class="upload-zone" id="dropZone"
+        ondragover="event.preventDefault();document.getElementById('dropZone').classList.add('drag-over')"
+        ondragleave="document.getElementById('dropZone').classList.remove('drag-over')"
+        ondrop="handleDrop(event)">
+        <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.xlsx,.csv" onchange="handleFiles(Array.from(event.target.files))">
+        <div class="upload-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0f0e0c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="upload-headline">Drop your invoices here</div>
+        <div class="upload-sub">Drag & drop or click to browse.<br>Every detail extracted automatically.</div>
+        <div class="format-tags">
+          <span class="tag">PDF</span><span class="tag">JPG</span><span class="tag">PNG</span><span class="tag">XLSX</span><span class="tag">CSV</span>
+        </div>
+      </div>
+
+      <div class="file-list" id="fileList"></div>
+
+      <div class="insights-row" id="insightsRow" style="display:none">
+        <div class="insight-card">
+          <div class="insight-label">Documents</div>
+          <div class="insight-value" id="docCount">0</div>
+          <div class="insight-sub">uploaded & indexed</div>
+          <div class="progress-bar"><div class="progress-fill" id="docBar" style="width:0%"></div></div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-label">Status</div>
+          <div class="insight-value" style="font-size:14px;color:#1d7a4a" id="statusVal">Ready</div>
+          <div class="insight-sub" id="statusSub">standing by</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#1d7a4a"></div></div>
+        </div>
+        <div class="insight-card">
+          <div class="insight-label">Last upload</div>
+          <div class="insight-value" style="font-size:13px" id="lastUpload">—</div>
+          <div class="insight-sub">most recent file</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-title">Ask a question</div>
+          <div class="chat-hint">Upload a document, then ask anything about it</div>
+        </div>
+        <button class="clear-btn" onclick="clearChat()">Clear chat</button>
+      </div>
+
+      <div class="chat-body" id="chatBody">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8680" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="empty-title">No messages yet</div>
+          <div class="empty-sub">Upload an invoice, then ask<br>anything about it below.</div>
+        </div>
+      </div>
+
+      <div class="quick-chips">
+        <button class="chip" onclick="askChip('What is the total amount due?')">Total due?</button>
+        <button class="chip" onclick="askChip('Who is the vendor?')">Vendor name?</button>
+        <button class="chip" onclick="askChip('What is the due date?')">Due date?</button>
+        <button class="chip" onclick="askChip('List all line items')">Line items</button>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <textarea class="chat-input" id="chatInput" placeholder="Ask anything about your invoice…" rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notification" id="notification">
+  <div class="notification-dot"></div>
+  <span id="notifText">File uploaded successfully</span>
+</div>
+
+<script>
+  let uploadedCount = 0, isTyping = false;
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('drag-over');
+    handleFiles(Array.from(e.dataTransfer.files));
+  }
+
+  async function handleFiles(newFiles) {
+    for (let file of newFiles) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const itemEl = renderFile(file, 'uploading');
+      showNotif("Uploading " + file.name + "...");
+
+      try {
+        const res = await fetch("/upload", { method: "POST", body: formData });
+        const data = await res.json();
+        setFileStatus(itemEl, 'Ready');
+        uploadedCount++;
+        updateInsights(file.name);
+        showNotif(data.message || "Uploaded successfully");
+      } catch (err) {
+        setFileStatus(itemEl, 'Failed', true);
+        showNotif("Upload failed for " + file.name);
+      }
+    }
+
+    document.getElementById('insightsRow').style.display = 'grid';
+    document.getElementById('docCount').textContent = uploadedCount;
+    document.getElementById('docBar').style.width = Math.min(uploadedCount * 20, 100) + '%';
+  }
+
+  function renderFile(f, status) {
+    const ext = f.name.split('.').pop().toUpperCase();
+    const size = f.size < 1024 ? f.size + ' B' : (f.size/1024).toFixed(1) + ' KB';
+    const el = document.createElement('div');
+    el.className = 'file-item';
+    el.innerHTML = `
+      <div class="file-dot">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8460a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <div class="file-info">
+        <div class="file-name">${f.name}</div>
+        <div class="file-meta">${ext} · ${size}</div>
+      </div>
+      <div class="file-status uploading" data-status>Uploading…</div>
+    `;
+    document.getElementById('fileList').appendChild(el);
+    return el;
+  }
+
+  function setFileStatus(el, label, isError) {
+    const s = el.querySelector('[data-status]');
+    s.textContent = label;
+    s.className = 'file-status' + (isError ? ' error' : '');
+  }
+
+  function updateInsights(lastName) {
+    document.getElementById('insightsRow').style.display = 'grid';
+    document.getElementById('docCount').textContent = uploadedCount;
+    document.getElementById('docBar').style.width = Math.min(uploadedCount * 20, 100) + '%';
+    const name = lastName.length > 14 ? lastName.slice(0, 13) + '…' : lastName;
+    document.getElementById('lastUpload').textContent = name;
+  }
+
+  function showNotif(text) {
+    const n = document.getElementById('notification');
+    document.getElementById('notifText').textContent = text;
+    n.classList.add('show');
+    clearTimeout(n._t);
+    n._t = setTimeout(() => n.classList.remove('show'), 3000);
+  }
+
+  function askChip(q) {
+    document.getElementById('chatInput').value = q;
+    sendMessage();
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const q = input.value.trim();
+    if (!q || isTyping) return;
+
+    const empty = document.getElementById('emptyState');
+    if (empty) empty.remove();
+
+    addMsg('user', q);
+    input.value = '';
+    input.style.height = 'auto';
+    isTyping = true;
+    document.getElementById('sendBtn').disabled = true;
+    showTyping();
+
+    try {
+      const res = await fetch("/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q })
+      });
+      const data = await res.json();
+      removeTyping();
+      addMsg('ai', data.answer || "No response received.");
+    } catch (err) {
+      removeTyping();
+      addMsg('ai', "Server error — check that your backend is running.");
+    }
+
+    isTyping = false;
+    document.getElementById('sendBtn').disabled = false;
+  }
+
+  async function clearChat() {
+    try {
+      await fetch("/clear", { method: "POST" });
+    } catch (e) {}
+    const body = document.getElementById('chatBody');
+    body.innerHTML = `
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8680" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="empty-title">Chat cleared</div>
+        <div class="empty-sub">Ask a new question below.</div>
+      </div>`;
+    showNotif("Chat cleared");
+  }
+
+  function addMsg(role, text) {
+    const body = document.getElementById('chatBody');
+    const t = new Date();
+    const time = t.getHours() + ':' + String(t.getMinutes()).padStart(2, '0');
+    const el = document.createElement('div');
+    el.className = 'message ' + role;
+    el.innerHTML = `<div class="msg-bubble">${text}</div><div class="msg-time">${time}</div>`;
+    body.appendChild(el);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function showTyping() {
+    const body = document.getElementById('chatBody');
+    const el = document.createElement('div');
+    el.className = 'message ai'; el.id = 'typingIndicator';
+    el.innerHTML = `<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    body.appendChild(el);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('typingIndicator');
+    if (t) t.remove();
+  }
+</script>
