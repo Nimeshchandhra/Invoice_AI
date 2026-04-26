@@ -6,3 +6,5 @@ faiss-cpu
 pypdf
 requests
 python-dotenv
+sentence-transformers
+gunicorn
